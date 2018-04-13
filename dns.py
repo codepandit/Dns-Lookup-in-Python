@@ -2,14 +2,10 @@ import struct
 import socket
 import argparse
 import dnslib
-
-#@author Patrick Mathieu / @pathetiq
-# This code is an update from: 
-# DNS packet struct packet taken from: http://stackoverflow.com/questions/24814044/having-trouble-building-a-dns-packet-in-python 
-# User: http://stackoverflow.com/users/3850901/monkeyba
-#
+import sys
 
 class DnsPacketBuilder:
+
         def __init__(self):
                 pass
 
@@ -17,8 +13,9 @@ class DnsPacketBuilder:
                 packet = struct.pack(">H", 12049)  # Query Ids (Just 1 for now)
                 #packet = struct.pack(">H", 23000)  # Query Ids for MX
                 #packet = struct.pack(">H", 1)  # Query Ids for CNAME
-                #packet = struct.pack(">H", 2)  # Query Ids for Inverse Query
+                #packet = struct.pack(">H", 2)  # Query Ids for IQuery
                 packet += struct.pack(">H", 256)  # Flags AA RA RD TC
+                #packet += struct.pack(">H", 2304)  # Flags for IQUERY
                 packet += struct.pack(">H", 1)  # Questions
                 packet += struct.pack(">H", 0)  # Answers
                 packet += struct.pack(">H", 0)  # Authorities
@@ -34,7 +31,7 @@ class DnsPacketBuilder:
                             packet += struct.pack("c", byte.encode('utf-8'))
                 
                 packet += struct.pack("B", 0)  # End of String
-                packet += struct.pack(">H", 12)  # Query Type 2-NS, 15-MX, 5-CNAME, 12-PTR
+                packet += struct.pack(">H", 5)  # Query Type 2-NS, 15-MX, 5-CNAME, 12-PTR
                 packet += struct.pack(">H", 1)  # Query Class
                 print(packet)
                 return packet
@@ -43,7 +40,7 @@ class DnsPacketBuilder:
    
 # Sending the packet
 builder = DnsPacketBuilder()
-packet = builder.build_packet("130.102.71.160")
+packet = builder.build_packet("eait.uq.edu.au")
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('', 8888))
 sock.settimeout(2)
@@ -53,4 +50,5 @@ data, addr = sock.recvfrom(1024)
 result = dnslib.DNSRecord().parse(data).format()
 
 print(result)
+print(sys.argv[0])
 sock.close()
