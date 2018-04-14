@@ -2,14 +2,14 @@ import struct
 import socket
 import argparse
 import dnslib
-import sys
+import re
 
-class DnsPacketBuilder:
+class DnsQueryBuilder:
 
         def __init__(self):
                 pass
 
-        def build_packet(self, url):
+        def build_query_packet(self, url, rtype):
                 packet = struct.pack(">H", 12049)  # Query Ids (Just 1 for now)
                 #packet = struct.pack(">H", 23000)  # Query Ids for MX
                 #packet = struct.pack(">H", 1)  # Query Ids for CNAME
@@ -21,34 +21,62 @@ class DnsPacketBuilder:
                 packet += struct.pack(">H", 0)  # Authorities
                 packet += struct.pack(">H", 0)  # Additional
                 
-                
-		#@TODO all message should be in the form of a IP address with padding and translation to 1 to 255
                 split_url = url.split(".")
                 for part in split_url:
-                        #parts = part.encode('utf-8')
                         packet += struct.pack("B", len(part))
                         for byte in part:
                             packet += struct.pack("c", byte.encode('utf-8'))
                 
                 packet += struct.pack("B", 0)  # End of String
-                packet += struct.pack(">H", 5)  # Query Type 2-NS, 15-MX, 5-CNAME, 12-PTR
+                print(rtype)
+                if rtype == b"CNAME":
+                        packet += struct.pack(">H", 5)  # Query Type 2-NS, 15-MX, 5-CNAME, 12-PTR
+                elif rtype == b"MX":
+                        print("here mx")
+                        packet += struct.pack(">H", 15)
+                else:
+                        packet += struct.pack(">H", 1)
+
                 packet += struct.pack(">H", 1)  # Query Class
-                print(packet)
+                #print(packet)
                 return packet
+
+def main():
+
+        #Creating an ArgumentParser object
+        parser = argparse.ArgumentParser(description='Custom nslookup by Nikhil Mehral')
+        #Adding Arguments into ArgumentParser object
+        parser.add_argument('url', help='Enter URl for DNS Query ')
+        parser.add_argument('--dns_ip', default="192.168.1.1", help='IP Adress of DNS Server, eg: --DNS_IP 8.8.8.8')
+        parser.add_argument('--rtype', default="AA", help='Request Query type, eg: AA, NS, CNAME, MX')
+        args = parser.parse_args()
+
+        url = args.url
+        dns = args.dns_ip.encode('utf-8')
+        rtype = args.rtype.encode('utf-8')
+        #print(dns)      
+        
                 
+        # Sending the packet
+        builder = DnsQueryBuilder()
+        packet = builder.build_query_packet(url, rtype)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind(('', 8888))
+        sock.settimeout(2)
+        sock.sendto(bytes(packet), (dns, 53))
+        print("Packet Sent")
+        data, addr = sock.recvfrom(1024)
+        result = dnslib.DNSRecord().parse(data).format()
+        s = result.splitlines()[0].split(' ')
+        print(result)
+        # for i in range(len(s)):
+        #         valid = re.search(r'type', s[i])
+        #         if valid != None:
+        #                 print(s[i])
+        #print(re.search(r'type', s))
 
-   
-# Sending the packet
-builder = DnsPacketBuilder()
-packet = builder.build_packet("eait.uq.edu.au")
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('', 8888))
-sock.settimeout(2)
-sock.sendto(bytes(packet), ("192.168.1.1", 53))
-print("Packet Sent")
-data, addr = sock.recvfrom(1024)
-result = dnslib.DNSRecord().parse(data).format()
+        sock.close()
 
-print(result)
-print(sys.argv[0])
-sock.close()
+
+if __name__ == "__main__":
+    main()
