@@ -41,6 +41,7 @@ class DnsPacketBuilder:
 # Sending the packet
 builder = DnsPacketBuilder()
 packet = builder.build_packet("eait.uq.edu.au")
+#packet = builder.build_packet("23.96.52.53")
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('', 8888))
 sock.settimeout(2)
