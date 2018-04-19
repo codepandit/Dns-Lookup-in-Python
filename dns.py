@@ -8,7 +8,8 @@ import binascii
 class DnsQueryBuilder:
 
         def __init__(self):
-                pass
+                self.url = ""
+                self.rtype = "AA"
 
         def build_query_packet(self, url, rtype):
                 packet = struct.pack(">H", 12049)  # Query Ids (Just 1 for now)
@@ -40,6 +41,31 @@ class DnsQueryBuilder:
                 #print(packet)
                 return packet
 
+def guiBuilder(domain, qtype):
+        print("running")
+        url = domain
+        rtype = qtype
+        dns = "192.168.1.1"
+         # Sending the packet
+        builder = DnsQueryBuilder()
+        packet = builder.build_query_packet(url, rtype)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind(('', 4444))
+        sock.settimeout(2)
+        sock.sendto(bytes(packet), (dns, 53))
+        data, addr = sock.recvfrom(1024)
+        result = dnslib.DNSRecord().parse(data).format()
+
+        # s = result.splitlines()[0].split(' ')
+        # print(result)
+        line = result.splitlines()
+        for i in range(len(line)):
+                print(line.pop())
+        #print(re.search(r'type', s))
+
+
+        sock.close()
+
 def main():
 
         #Creating an ArgumentParser object
@@ -47,7 +73,7 @@ def main():
         #Adding Arguments into ArgumentParser object
         parser.add_argument('url', help='Enter URl for DNS Query ')
         parser.add_argument('--dns_ip', default="192.168.1.1", help='IP Adress of DNS Server, eg: --dns_ip 8.8.8.8')
-        parser.add_argument('--rtype', default="AA", help='Request Query type, eg: AA, NS, CNAME, MX')
+        parser.add_argument('--rtype', default="AA", choices=["AA", "MX", "CNAME"], help='Request Query type, eg: --rtype AA, NS, CNAME, MX')
         args = parser.parse_args()
 
         url = args.url
@@ -65,22 +91,12 @@ def main():
         sock.sendto(bytes(packet), (dns, 53))
         data, addr = sock.recvfrom(1024)
         result = dnslib.DNSRecord().parse(data).format()
-        #print(binascii.unhexlify(data))
+
+        # s = result.splitlines()[0].split(' ')
+        # print(result)
         line = result.splitlines()
-        #print(result)
-        #print(line)
-        # print(line.pop())
         for i in range(len(line)):
                 print(line.pop())
-        # for i in range(len(line)):
-        #         l = line[i].split(' ') 
-        #         for j in range(len(l)):
-        #                 valid = re.search(r'type', l[j])
-        #                 if valid != None:
-        #                         if l[j] == 'rtype=MX':
-        #                                 print(l[-1].strip(".'>"))
-        #                         elif l[j] == 'rtype=CNAME':
-        #                                 print(l[-1].strip(".'>"))
         #print(re.search(r'type', s))
 
 
