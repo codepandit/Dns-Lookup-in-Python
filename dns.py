@@ -3,6 +3,7 @@ import socket
 import argparse
 import dnslib
 import re
+import binascii
 
 class DnsQueryBuilder:
 
@@ -28,11 +29,9 @@ class DnsQueryBuilder:
                             packet += struct.pack("c", byte.encode('utf-8'))
                 
                 packet += struct.pack("B", 0)  # End of String
-                print(rtype)
                 if rtype == b"CNAME":
                         packet += struct.pack(">H", 5)  # Query Type 2-NS, 15-MX, 5-CNAME, 12-PTR
                 elif rtype == b"MX":
-                        print("here mx")
                         packet += struct.pack(">H", 15)
                 else:
                         packet += struct.pack(">H", 1)
@@ -47,7 +46,7 @@ def main():
         parser = argparse.ArgumentParser(description='Custom nslookup by Nikhil Mehral')
         #Adding Arguments into ArgumentParser object
         parser.add_argument('url', help='Enter URl for DNS Query ')
-        parser.add_argument('--dns_ip', default="192.168.1.1", help='IP Adress of DNS Server, eg: --DNS_IP 8.8.8.8')
+        parser.add_argument('--dns_ip', default="192.168.1.1", help='IP Adress of DNS Server, eg: --dns_ip 8.8.8.8')
         parser.add_argument('--rtype', default="AA", help='Request Query type, eg: AA, NS, CNAME, MX')
         args = parser.parse_args()
 
@@ -64,16 +63,26 @@ def main():
         sock.bind(('', 8888))
         sock.settimeout(2)
         sock.sendto(bytes(packet), (dns, 53))
-        print("Packet Sent")
         data, addr = sock.recvfrom(1024)
         result = dnslib.DNSRecord().parse(data).format()
-        s = result.splitlines()[0].split(' ')
-        print(result)
-        # for i in range(len(s)):
-        #         valid = re.search(r'type', s[i])
-        #         if valid != None:
-        #                 print(s[i])
+        #print(binascii.unhexlify(data))
+        line = result.splitlines()
+        #print(result)
+        #print(line)
+        # print(line.pop())
+        for i in range(len(line)):
+                print(line.pop())
+        # for i in range(len(line)):
+        #         l = line[i].split(' ') 
+        #         for j in range(len(l)):
+        #                 valid = re.search(r'type', l[j])
+        #                 if valid != None:
+        #                         if l[j] == 'rtype=MX':
+        #                                 print(l[-1].strip(".'>"))
+        #                         elif l[j] == 'rtype=CNAME':
+        #                                 print(l[-1].strip(".'>"))
         #print(re.search(r'type', s))
+
 
         sock.close()
 
