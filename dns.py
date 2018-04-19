@@ -33,8 +33,9 @@ class DnsQueryBuilder:
                 if rtype == b"CNAME":
                         packet += struct.pack(">H", 5)  # Query Type 2-NS, 15-MX, 5-CNAME, 12-PTR
                 elif rtype == b"MX":
-                        print("here mx")
                         packet += struct.pack(">H", 15)
+                elif rtype == b"PTR":
+                        packet += struct.pack(">H", 12)
                 else:
                         packet += struct.pack(">H", 1)
 
@@ -49,7 +50,7 @@ def main():
         #Adding Arguments into ArgumentParser object
         parser.add_argument('url', help='Enter URl for DNS Query ')
         parser.add_argument('--dns_ip', default="192.168.1.1", help='IP Adress of DNS Server, eg: --dns_ip 8.8.8.8')
-        parser.add_argument('--rtype', default="AA", choices=["AA", "MX", "CNAME"], help='Request Query type, eg: --rtype AA, NS, CNAME, MX')
+        parser.add_argument('--rtype', default="AA", choices=["AA", "MX", "CNAME", "PTR"], help='Request Query type, eg: --rtype AA, NS, CNAME, MX')
         args = parser.parse_args()
 
         url = args.url
