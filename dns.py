@@ -3,6 +3,7 @@ import socket
 import argparse
 import dnslib
 import re
+import binascii
 
 class DnsQueryBuilder:
 
@@ -29,7 +30,6 @@ class DnsQueryBuilder:
                             packet += struct.pack("c", byte.encode('utf-8'))
                 
                 packet += struct.pack("B", 0)  # End of String
-                print(rtype)
                 if rtype == b"CNAME":
                         packet += struct.pack(">H", 5)  # Query Type 2-NS, 15-MX, 5-CNAME, 12-PTR
                 elif rtype == b"MX":
@@ -42,6 +42,31 @@ class DnsQueryBuilder:
                 packet += struct.pack(">H", 1)  # Query Class
                 #print(packet)
                 return packet
+
+def guiBuilder(domain, qtype):
+        print("running")
+        url = domain
+        rtype = qtype
+        dns = "192.168.1.1"
+         # Sending the packet
+        builder = DnsQueryBuilder()
+        packet = builder.build_query_packet(url, rtype)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind(('', 4444))
+        sock.settimeout(2)
+        sock.sendto(bytes(packet), (dns, 53))
+        data, addr = sock.recvfrom(1024)
+        result = dnslib.DNSRecord().parse(data).format()
+
+        # s = result.splitlines()[0].split(' ')
+        # print(result)
+        line = result.splitlines()
+        for i in range(len(line)):
+                print(line.pop())
+        #print(re.search(r'type', s))
+
+
+        sock.close()
 
 def main():
 
@@ -66,9 +91,9 @@ def main():
         sock.bind(('', 8888))
         sock.settimeout(2)
         sock.sendto(bytes(packet), (dns, 53))
-        print("Packet Sent")
         data, addr = sock.recvfrom(1024)
         result = dnslib.DNSRecord().parse(data).format()
+
         # s = result.splitlines()[0].split(' ')
         # print(result)
         line = result.splitlines()
@@ -76,8 +101,11 @@ def main():
                 print(line.pop())
         #print(re.search(r'type', s))
 
+
         sock.close()
+
 
 
 if __name__ == "__main__":
     main()
+
