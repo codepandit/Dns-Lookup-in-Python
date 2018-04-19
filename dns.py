@@ -7,7 +7,8 @@ import re
 class DnsQueryBuilder:
 
         def __init__(self):
-                pass
+                self.url = ""
+                self.rtype = "AA"
 
         def build_query_packet(self, url, rtype):
                 packet = struct.pack(">H", 12049)  # Query Ids (Just 1 for now)
@@ -47,8 +48,8 @@ def main():
         parser = argparse.ArgumentParser(description='Custom nslookup by Nikhil Mehral')
         #Adding Arguments into ArgumentParser object
         parser.add_argument('url', help='Enter URl for DNS Query ')
-        parser.add_argument('--dns_ip', default="192.168.1.1", help='IP Adress of DNS Server, eg: --DNS_IP 8.8.8.8')
-        parser.add_argument('--rtype', default="AA", help='Request Query type, eg: AA, NS, CNAME, MX')
+        parser.add_argument('--dns_ip', default="192.168.1.1", help='IP Adress of DNS Server, eg: --dns_ip 8.8.8.8')
+        parser.add_argument('--rtype', default="AA", choices=["AA", "MX", "CNAME"], help='Request Query type, eg: --rtype AA, NS, CNAME, MX')
         args = parser.parse_args()
 
         url = args.url
@@ -67,12 +68,11 @@ def main():
         print("Packet Sent")
         data, addr = sock.recvfrom(1024)
         result = dnslib.DNSRecord().parse(data).format()
-        s = result.splitlines()[0].split(' ')
-        print(result)
-        # for i in range(len(s)):
-        #         valid = re.search(r'type', s[i])
-        #         if valid != None:
-        #                 print(s[i])
+        # s = result.splitlines()[0].split(' ')
+        # print(result)
+        line = result.splitlines()
+        for i in range(len(line)):
+                print(line.pop())
         #print(re.search(r'type', s))
 
         sock.close()
