@@ -54,10 +54,13 @@ class DNS_Lookup_By_Nikhil_Mehral:
     
 
     def something(self):
-        dns.guiBuilder(self.domainName.get(), self.qType)
-       
+        result = dns.guiBuilder(self.domainName.get(), self.qType.get()) 
+        self.textBox.delete("1.0", END)
+        for i in range(len(result)):
+                self.textBox.insert(END, result[i]) 
+                self.textBox.insert(END, '\n')  
+        
 
-    
 
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
@@ -82,7 +85,7 @@ class DNS_Lookup_By_Nikhil_Mehral:
 
 
         self.domainName = ttk.Entry(top)
-        self.domainName.place(relx=0.1, rely=0.09, relheight=0.04, relwidth=0.31)
+        self.domainName.place(relx=0.1, rely=0.09, relheight=0.05, relwidth=0.31)
         
         self.domainName.configure(width=194)
         self.domainName.configure(takefocus="")
@@ -91,7 +94,7 @@ class DNS_Lookup_By_Nikhil_Mehral:
 
 
         self.dnsIP = ttk.Entry(top)
-        self.dnsIP.place(relx=0.43, rely=0.09, relheight=0.04, relwidth=0.23)
+        self.dnsIP.place(relx=0.43, rely=0.09, relheight=0.05, relwidth=0.23)
         self.dnsIP.configure(takefocus="")
         self.dnsIP.configure(cursor="xterm")
 
@@ -108,7 +111,9 @@ class DNS_Lookup_By_Nikhil_Mehral:
         self.qtLabel.configure(text='''Query Type''')
 
         self.qType = ttk.Combobox(top)
-        self.qType.place(relx=0.69, rely=0.09, relheight=0.04, relwidth=0.22)
+        self.qType.place(relx=0.69, rely=0.09, relheight=0.05, relwidth=0.22)
+        self.value_list = ['AA', 'MX', 'PTR', 'CNAME']
+        self.qType.configure(values=self.value_list)
         self.qType.configure(textvariable=dnsGui_support.combobox)
         self.qType.configure(width=137)
         self.qType.configure(takefocus="")
@@ -126,7 +131,7 @@ class DNS_Lookup_By_Nikhil_Mehral:
         self.textBox.configure(selectbackground="#c4c4c4")
         self.textBox.configure(width=506)
         self.textBox.configure(wrap=WORD)
-
+        
 
 
 

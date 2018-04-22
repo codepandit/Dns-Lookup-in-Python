@@ -4,6 +4,7 @@ import argparse
 import dnslib
 import re
 import binascii
+import dnsGui
 
 class DnsQueryBuilder:
 
@@ -28,13 +29,12 @@ class DnsQueryBuilder:
                         packet += struct.pack("B", len(part))
                         for byte in part:
                             packet += struct.pack("c", byte.encode('utf-8'))
-                
                 packet += struct.pack("B", 0)  # End of String
-                if rtype == b"CNAME":
+                if rtype == b"CNAME" or rtype == "CNAME":
                         packet += struct.pack(">H", 5)  # Query Type 2-NS, 15-MX, 5-CNAME, 12-PTR
-                elif rtype == b"MX":
+                elif rtype == b"MX" or rtype == "MX":
                         packet += struct.pack(">H", 15)
-                elif rtype == b"PTR":
+                elif rtype == b"PTR" or rtype == "PTR":
                         packet += struct.pack(">H", 12)
                 else:
                         packet += struct.pack(">H", 1)
@@ -44,7 +44,7 @@ class DnsQueryBuilder:
                 return packet
 
 def guiBuilder(domain, qtype):
-        print("running")
+        #print("running")
         url = domain
         rtype = qtype
         dns = "192.168.1.1"
@@ -57,15 +57,9 @@ def guiBuilder(domain, qtype):
         sock.sendto(bytes(packet), (dns, 53))
         data, addr = sock.recvfrom(1024)
         result = dnslib.DNSRecord().parse(data).format()
-
-        # s = result.splitlines()[0].split(' ')
-        # print(result)
         line = result.splitlines()
-        for i in range(len(line)):
-                print(line.pop())
-        #print(re.search(r'type', s))
-
-
+        return line
+        
         sock.close()
 
 def main():
@@ -98,7 +92,7 @@ def main():
         # print(result)
         line = result.splitlines()
         for i in range(len(line)):
-                print(line.pop())
+                print(line[i])
         #print(re.search(r'type', s))
 
 
