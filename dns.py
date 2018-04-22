@@ -43,11 +43,14 @@ class DnsQueryBuilder:
                 #print(packet)
                 return packet
 
-def guiBuilder(domain, qtype):
+def guiBuilder(domain, qtype, dnsIP):
         #print("running")
         url = domain
         rtype = qtype
-        dns = "192.168.1.1"
+        if dnsIP == "":
+                dns = "192.168.1.1"
+        else:
+                dns = dnsIP
          # Sending the packet
         builder = DnsQueryBuilder()
         packet = builder.build_query_packet(url, rtype)
@@ -58,9 +61,8 @@ def guiBuilder(domain, qtype):
         data, addr = sock.recvfrom(1024)
         result = dnslib.DNSRecord().parse(data).format()
         line = result.splitlines()
-        return line
-        
         sock.close()
+        return line
 
 def main():
 

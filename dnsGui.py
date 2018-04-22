@@ -54,7 +54,7 @@ class DNS_Lookup_By_Nikhil_Mehral:
     
 
     def something(self):
-        result = dns.guiBuilder(self.domainName.get(), self.qType.get()) 
+        result = dns.guiBuilder(self.domainName.get(), self.qType.get(), self.dnsIP.get()) 
         self.textBox.delete("1.0", END)
         for i in range(len(result)):
                 self.textBox.insert(END, result[i]) 
