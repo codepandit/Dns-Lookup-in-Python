@@ -24,7 +24,7 @@ class DnsQueryBuilder:
                 
                 split_url = url.split(".")
                 try:
-                        print("in try block")
+                        #print("in try block")
                         if isinstance(int(split_url[0]), int):
                                 split_url.append('in-addr')
                                 split_url.append('arpa')
@@ -39,22 +39,12 @@ class DnsQueryBuilder:
                                 packet += struct.pack("c", byte.encode('utf-8'))
                         packet += struct.pack("B", len(split_url[5]))
                         for byte in split_url[5]:
-                                
                                 packet += struct.pack("c", byte.encode('utf-8'))
 
                         packet += struct.pack("B", 0)  # End of String
-                        if rtype == b"CNAME" or rtype == "CNAME":
-                                packet += struct.pack(">H", 5)  # Query Type 2-NS, 15-MX, 5-CNAME, 12-PTR, 28-AAAA
-                        elif rtype == b"MX" or rtype == "MX":
-                                packet += struct.pack(">H", 15)
-                        elif rtype == b"PTR" or rtype == "PTR":
-                                packet += struct.pack(">H", 12)
-                        elif rtype == b"AAAA" or rtype == "AAAA":
-                                packet += struct.pack(">H", 28)
-                        else:
-                                packet += struct.pack(">H", 1)
-
+                        packet += struct.pack(">H", 12) # Hardcoded default to inverse query because if code enters this section it would be for inverse query
                         packet += struct.pack(">H", 1)  # Query Class
+
                 except:
                         
                         
