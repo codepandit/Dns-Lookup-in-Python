@@ -2,10 +2,6 @@ import struct
 import socket
 import argparse
 import dnslib
-<<<<<<< HEAD
-=======
-
->>>>>>> 7c3b9965f9f3e66bb601c99a8a419ff425d7eb69
 
 class DnsQueryBuilder:
 
@@ -120,13 +116,65 @@ def main():
         data, addr = sock.recvfrom(1024)
         result = dnslib.DNSRecord().parse(data).format()
 
-        # s = result.splitlines()[0].split(' ')
-        # print(result)
         line = result.splitlines()
         for i in range(len(line)):
-                print(line[i])
-        #print(re.search(r'type', s))
+                #print(line[i])
+                words = line[i].split(' ')
+                #print(words)
+                for i in range(len(words)):
+                        if words[i] == 'Question:':
+                                print('Host name: ' + words[i+1].strip(".'"))
+                        elif words[i] == 'rtype=A' or words[i] == 'rtype=AAAA':
+                                ip = words[-1][7:].strip("'>")
+                                if (len(ip) > 20):
+                                        print("IPv6: " + ip)
+                                else:
+                                        print("IPv4: " + ip)
+                        elif words[i] == 'rtype=MX':
+                                print("MX: " + words[-1].strip(".'>"))
+                        elif words[i] == 'rtype=CNAME':
+                                print("CNAME: " + words[-1][7:].strip(".'>"))
+                        elif words[i] == 'rtype=PTR':
+                                print("Inverse: " + words[-1][7:].strip(".'>"))
+                        
 
+                # for word in words:
+                        
+                #         try:
+                #                 rwords = word.split()
+                #                 #print(rwords)
+                #                 for j in rwords:
+                #                         #print(rwords)
+                #                         if j == 'rdata':
+                #                                 print(j)
+                #                                 ip = rwords[1].strip('>').split('.')
+                #                                 #print(ip[0][3])
+                #                                 try:
+                #                                         if isinstance(int(ip[0][1]),int):
+                #                                                 if (len(rwords[1]) > 20):
+                #                                                         print('IPv6: ' + rwords[1].strip('>'))
+                #                                                 else:
+                #                                                         print('IPv4: ' + rwords[1].strip('>'))
+
+                #                                         # elif isinstance(int(ip[1]), int):
+                #                                         #         print('Ip address: ' + rwords[1].strip('>'))
+                                                        
+                #                                 except:
+                                                
+                #                                         print('CName: ' + rwords[1].strip('>'))
+                #                         elif j == 'rtype' and j+1 == 'MX':
+                #                                 print(j+1)
+
+                                        
+                                                
+                                                        
+                #         except:
+                #                 pass
+                #         if word == 'Question:':
+                #                 i = words.index(word)
+                #                 print('Host name: ' + words[i+1])
+        
+        #print(re.search(r'type', s))
 
         sock.close()
 

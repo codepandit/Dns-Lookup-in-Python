@@ -51,8 +51,47 @@ class DNS_Lookup_By_Nikhil_Mehral:
         result = dns.guiBuilder(self.domainName.get(), self.qType.get(), self.dnsIP.get()) 
         self.textBox.delete("1.0", END)
         for i in range(len(result)):
-                self.textBox.insert(END, result[i]) 
-                self.textBox.insert(END, '\n')  
+
+            #print(line[i])
+            words = result[i].split(' ')
+            #print(words)
+            for i in range(len(words)):
+                    if words[i] == 'Question:':
+                        self.textBox.insert(END, 'Host Name: ')
+                        self.textBox.insert(END, words[i+1].strip(".'")) 
+                        self.textBox.insert(END, '\n')
+                        #print('Host name: ' + words[i+1].strip(".'"))
+                    elif words[i] == 'rtype=A' or words[i] == 'rtype=AAAA':
+                        ip = words[-1][7:].strip("'>")
+                        if (len(ip) > 20):
+                            self.textBox.insert(END, 'IPv6: ')
+                            self.textBox.insert(END, words[-1][7:].strip("'>")) 
+                            self.textBox.insert(END, '\n')
+                            #print("IPv6: " + ip)
+                        else:
+                            self.textBox.insert(END, 'IPv4: ')
+                            self.textBox.insert(END, words[-1][7:].strip("'>"))  
+                            self.textBox.insert(END, '\n')
+                            #print("IPv4: " + ip)
+                    elif words[i] == 'rtype=MX':
+                        self.textBox.insert(END, 'MX: ')
+                        self.textBox.insert(END, words[-1].strip(".'>"))  
+                        self.textBox.insert(END, '\n')
+                        #print("MX: " + words[-1].strip(".'>"))
+                    elif words[i] == 'rtype=CNAME':
+                        self.textBox.insert(END, 'CNAME: ')
+                        self.textBox.insert(END, words[-1][7:].strip(".'>"))  
+                        self.textBox.insert(END, '\n')
+                        #print("CNAME: " + words[-1][7:].strip(".'>"))
+                    elif words[i] == 'rtype=PTR':
+                        self.textBox.insert(END, 'Inverse: ')
+                        self.textBox.insert(END, words[-1][7:].strip(".'>"))  
+                        self.textBox.insert(END, '\n')
+                        #print("Inverse: " + words[-1][7:].strip(".'>"))
+            
+
+    # self.textBox.insert(END, result[i]) 
+    # self.textBox.insert(END, '\n')  
         
 
 
