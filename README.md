@@ -9,6 +9,11 @@ To use dns.py user will require to enter atleast one parameter that is website o
 
 To run the GUI program you have to run python dnsGui.py
 
+## Dependecies 
+```
+pip install dnslib 
+```
+
 ### Examples 
 
 
