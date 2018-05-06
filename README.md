@@ -38,6 +38,6 @@ python dnsGui.py
 ## Author
 
 * **Nikhil Mehral** - [codepandit](https://github.com/codepandit)
-The repository is private
+
 
 
