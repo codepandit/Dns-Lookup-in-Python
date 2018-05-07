@@ -11,11 +11,7 @@ class DnsQueryBuilder:
 
         def build_query_packet(self, url, rtype):
                 packet = struct.pack(">H", 1)  # Query Ids (Just 1 default)
-                #packet = struct.pack(">H", 23000)  # Query Ids for MX
-                #packet = struct.pack(">H", 1)  # Query Ids for CNAME
-                #packet = struct.pack(">H", 2)  # Query Ids for IQuery
                 packet += struct.pack(">H", 256)  # Flags AA RA RD TC
-                #packet += struct.pack(">H", 2304)  # Flags for IQUERY
                 packet += struct.pack(">H", 1)  # Questions
                 packet += struct.pack(">H", 0)  # Answers
                 packet += struct.pack(">H", 0)  # Authorities
@@ -74,7 +70,7 @@ def guiBuilder(domain, qtype, dnsIP):
         url = domain
         rtype = qtype
         if dnsIP == "":
-                dns = "192.168.1.1"
+                dns = "1.1.1.1"
         else:
                 dns = dnsIP
          # Sending the packet
@@ -96,7 +92,7 @@ def main():
         parser = argparse.ArgumentParser(description='Custom nslookup by Nikhil Mehral')
         #Adding Arguments into ArgumentParser object
         parser.add_argument('url', help='Enter URl for DNS Query ')
-        parser.add_argument('--dns_ip', default="192.168.1.1", help='IP Adress of DNS Server, eg: --dns_ip 8.8.8.8')
+        parser.add_argument('--dns_ip', default="1.1.1.1", help='IP Adress of DNS Server, eg: --dns_ip 8.8.8.8')
         parser.add_argument('--rtype', default="AA", choices=["AA", "MX", "CNAME", "PTR", "AAAA"], help='Request Query type, eg: --rtype AA, NS, CNAME, MX, AAAA')
         args = parser.parse_args()
 
@@ -136,45 +132,7 @@ def main():
                                 print("CNAME: " + words[-1][7:].strip(".'>"))
                         elif words[i] == 'rtype=PTR':
                                 print("Inverse: " + words[-1][7:].strip(".'>"))
-                        
-
-                # for word in words:
-                        
-                #         try:
-                #                 rwords = word.split()
-                #                 #print(rwords)
-                #                 for j in rwords:
-                #                         #print(rwords)
-                #                         if j == 'rdata':
-                #                                 print(j)
-                #                                 ip = rwords[1].strip('>').split('.')
-                #                                 #print(ip[0][3])
-                #                                 try:
-                #                                         if isinstance(int(ip[0][1]),int):
-                #                                                 if (len(rwords[1]) > 20):
-                #                                                         print('IPv6: ' + rwords[1].strip('>'))
-                #                                                 else:
-                #                                                         print('IPv4: ' + rwords[1].strip('>'))
-
-                #                                         # elif isinstance(int(ip[1]), int):
-                #                                         #         print('Ip address: ' + rwords[1].strip('>'))
-                                                        
-                #                                 except:
-                                                
-                #                                         print('CName: ' + rwords[1].strip('>'))
-                #                         elif j == 'rtype' and j+1 == 'MX':
-                #                                 print(j+1)
-
-                                        
-                                                
-                                                        
-                #         except:
-                #                 pass
-                #         if word == 'Question:':
-                #                 i = words.index(word)
-                #                 print('Host name: ' + words[i+1])
-        
-        #print(re.search(r'type', s))
+                    
 
         sock.close()
 
